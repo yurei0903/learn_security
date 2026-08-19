@@ -8,7 +8,12 @@ import { UserProfile, userProfileSchema } from "../_types/UserProfile";
 import { TextInputField } from "@/app/_components/TextInputField";
 import { ErrorMsgField } from "@/app/_components/ErrorMsgField";
 import { Button } from "@/app/_components/Button";
-import { faSpinner, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSpinner,
+  faRightToBracket,
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
 import NextLink from "next/link";
@@ -26,6 +31,7 @@ const Page: React.FC = () => {
   const [isPending, setIsPending] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoginCompleted, setIsLoginCompleted] = useState(false);
+  const [passState, setPassState] = useState(true);
 
   // フォーム処理関連の準備と設定
   const formMethods = useForm<LoginRequest>({
@@ -60,8 +66,10 @@ const Page: React.FC = () => {
   }, [isLoginCompleted, router]);
 
   // ルートエラーのクリア用 onChange ハンドラ合成
-  const { onChange: onEmailChange, ...emailRegister } = formMethods.register(c_Email);
-  const { onChange: onPasswordChange, ...passwordRegister } = formMethods.register(c_Password);
+  const { onChange: onEmailChange, ...emailRegister } =
+    formMethods.register(c_Email);
+  const { onChange: onPasswordChange, ...passwordRegister } =
+    formMethods.register(c_Password);
   const clearRootOnChange =
     (originalOnChange: React.ChangeEventHandler<HTMLInputElement>) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,20 +156,35 @@ const Page: React.FC = () => {
           <label htmlFor={c_Password} className="mb-2 block font-bold">
             パスワード
           </label>
-          <TextInputField
-            {...passwordRegister}
-            onChange={clearRootOnChange(onPasswordChange)}
-            id={c_Password}
-            placeholder="*****"
-            type="password"
-            disabled={isPending || isLoginCompleted}
-            error={!!fieldErrors.password}
-            autoComplete="off"
-          />
+          <div className="relative">
+            <TextInputField
+              {...passwordRegister}
+              className="pr-10"
+              onChange={clearRootOnChange(onPasswordChange)}
+              id={c_Password}
+              placeholder="*****"
+              type={passState ? "password" : "text"}
+              disabled={isPending || isLoginCompleted}
+              error={!!fieldErrors.password}
+              autoComplete="current-password"
+            />
+            <Button
+              variant="indigo"
+              className={
+                "absolute top-1/2 right-0 h-10 w-10 -translate-y-1/2 p-0"
+              }
+              isBusy={isPending}
+              disabled={false}
+              type="button"
+              onClick={() => setPassState((passState) => !passState)}
+              aria-label={passState ? "パスワードを表示" : "パスワードを非表示"}
+            >
+              <FontAwesomeIcon icon={passState ? faEyeSlash : faEye} />
+            </Button>
+          </div>
           <ErrorMsgField msg={fieldErrors.password?.message} />
           <ErrorMsgField msg={fieldErrors.root?.message} />
         </div>
-
         <Button
           variant="indigo"
           width="stretch"
