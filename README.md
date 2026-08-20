@@ -4,6 +4,10 @@
 
 # 仕様技術
 
+
+https://github.com/user-attachments/assets/d95d00e9-01d9-47bb-bcc3-1efb4aca89c4
+
+
 - TypeScript
 - react
 - prisma
