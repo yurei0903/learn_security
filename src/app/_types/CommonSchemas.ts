@@ -1,7 +1,13 @@
 import { z } from "zod";
 import { Role } from "./Role";
 
-export const passwordSchema = z.string().min(5);
+export const passwordSchema = z
+  .string()
+  .min(5)
+  .regex(
+    /^[a-zA-Z0-9!-/:-@¥[-`{-~]*$/,
+    "パスワードは半角英数記号のみ使用できます。",
+  );
 export const emailSchema = z.string().email();
 export const userNameSchema = z.string().min(1);
 export const roleSchema = z.enum(Role);

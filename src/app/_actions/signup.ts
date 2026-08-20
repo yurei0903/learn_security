@@ -6,14 +6,13 @@ import { userProfileSchema } from "@/app/_types/UserProfile";
 import type { SignupRequest } from "@/app/_types/SignupRequest";
 import type { UserProfile } from "@/app/_types/UserProfile";
 import type { ServerActionResponse } from "@/app/_types/ServerActionResponse";
+import bcrypt from "bcryptjs";
 
 // ユーザのサインアップのサーバアクション
 export const signupServerAction = async (
   signupRequest: SignupRequest,
 ): Promise<ServerActionResponse<UserProfile | null>> => {
   try {
-    // 入力検証
-    // 💀 現状では日本語のPWも受け入れてしまう -> SignupRequest のバリデーション見直し
     const payload = signupRequestSchema.parse(signupRequest);
 
     // 💡スパム登録対策（1秒遅延）
@@ -32,11 +31,7 @@ export const signupServerAction = async (
         message: "このメールアドレスは既に使用されています。",
       };
     }
-
-    // パスワードのハッシュ化
-    // 💀 ハッシュ化せずにPW保存（ダメ絶対）
-    const hashedPassword = payload.password;
-    // const hashedPassword = await bcrypt.hash(payload.password, 10);
+    const hashedPassword = await bcrypt.hash(payload.password, 10);
 
     // ユーザの作成
     const user = await prisma.user.create({
@@ -61,10 +56,7 @@ export const signupServerAction = async (
     return {
       success: false,
       payload: null,
-      message: errorMsg,
-      // 💀 エラーメッセージはユーザに見せない方が良い
-      // システム内部構造や依存関係をユーザに漏らす可能性がある
-      // message: "サインアップのサーバサイドの処理に失敗しました。",
+      message: "サインアップのサーバーサイドの処理に失敗しました",
     };
   }
 };
