@@ -3,7 +3,6 @@
 このWebアプリは認証関連のセキュリティについてTypeScriptを用いて実装して勉強するためのものです。
 
 # 仕様技術
-
 - TypeScript
 - react
 - prisma
@@ -20,3 +19,5 @@
 - パスワードの表示非表示切り替え
 
 ## 動作している映像
+
+https://github.com/user-attachments/assets/d95d00e9-01d9-47bb-bcc3-1efb4aca89c4
