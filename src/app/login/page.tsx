@@ -106,11 +106,6 @@ const Page: React.FC = () => {
       if (AUTH.isSession) {
         // ■■ セッションベース認証の処理 ■■
         setUserProfile(userProfileSchema.parse(body.payload));
-      } else {
-        // ■■ トークンベース認証の処理 ■■
-        const jwt = body.payload as string;
-        localStorage.setItem("jwt", jwt); // JWT をローカルストレージに保存
-        setUserProfile(userProfileSchema.parse(decodeJwt(jwt)));
       }
       mutate("/api/auth", body);
       setIsLoginCompleted(true);

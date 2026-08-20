@@ -12,7 +12,12 @@ import { ErrorMsgField } from "@/app/_components/ErrorMsgField";
 import { Button } from "@/app/_components/Button";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { faSpinner, faPenNib } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSpinner,
+  faPenNib,
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { signupServerAction } from "@/app/_actions/signup";
@@ -21,12 +26,14 @@ const Page: React.FC = () => {
   const c_Name = "name";
   const c_Email = "email";
   const c_Password = "password";
+  const c_CheckPassword = "checkPassword";
 
   const router = useRouter();
 
   const [isPending, startTransition] = useTransition();
   const [isSignUpCompleted, setIsSignUpCompleted] = useState(false);
-
+  const [passState, setPassState] = useState(true);
+  const [checkPasssState, setcheckPasssState] = useState(true);
   // フォーム処理関連の準備と設定
   const formMethods = useForm<SignupRequest>({
     mode: "onChange",
@@ -43,8 +50,12 @@ const Page: React.FC = () => {
   };
 
   // ルートエラーのクリア用 onChange ハンドラ合成
-  const { onChange: onEmailChange, ...emailRegister } = formMethods.register(c_Email);
-  const { onChange: onPasswordChange, ...passwordRegister } = formMethods.register(c_Password);
+  const { onChange: onEmailChange, ...emailRegister } =
+    formMethods.register(c_Email);
+  const { onChange: onPasswordChange, ...passwordRegister } =
+    formMethods.register(c_Password);
+  const { onChange: onCheckPasswordChange, ...checkPassRegister } =
+    formMethods.register(c_CheckPassword);
   const clearRootOnChange =
     (originalOnChange: React.ChangeEventHandler<HTMLInputElement>) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,29 +139,77 @@ const Page: React.FC = () => {
           <label htmlFor={c_Password} className="mb-2 block font-bold">
             パスワード
           </label>
-          <TextInputField
-            {...passwordRegister}
-            onChange={clearRootOnChange(onPasswordChange)}
-            id={c_Password}
-            placeholder="*****"
-            type="password"
-            disabled={isPending || isSignUpCompleted}
-            error={!!fieldErrors.password}
-            autoComplete="off"
-          />
+          <div className="relative">
+            <TextInputField
+              {...passwordRegister}
+              onChange={clearRootOnChange(onPasswordChange)}
+              id={c_Password}
+              placeholder="*****"
+              type={passState ? "password" : "text"}
+              disabled={isPending || isSignUpCompleted}
+              error={!!fieldErrors.password}
+              autoComplete="off"
+            />
+            <Button
+              variant="indigo"
+              className={
+                "absolute top-1/2 right-0 h-10 w-10 -translate-y-1/2 p-0"
+              }
+              isBusy={isPending}
+              disabled={false}
+              type="button"
+              onClick={() => setPassState((passState) => !passState)}
+              aria-label={passState ? "パスワードを表示" : "パスワードを非表示"}
+            >
+              <FontAwesomeIcon icon={passState ? faEyeSlash : faEye} />
+            </Button>
+          </div>
           <ErrorMsgField msg={fieldErrors.password?.message} />
           <ErrorMsgField msg={fieldErrors.root?.message} />
         </div>
-
+        <label htmlFor={c_CheckPassword} className="mb-2 block font-bold">
+          確認用パスワード
+        </label>
+        <div>
+          <div className="relative">
+            <TextInputField
+              {...checkPassRegister}
+              onChange={clearRootOnChange(onCheckPasswordChange)}
+              id={c_CheckPassword}
+              placeholder="*****"
+              type={checkPasssState ? "password" : "text"}
+              disabled={isPending || isSignUpCompleted}
+              error={!!fieldErrors.password}
+              autoComplete="off"
+            />
+            <Button
+              variant="indigo"
+              className={
+                "absolute top-1/2 right-0 h-10 w-10 -translate-y-1/2 p-0"
+              }
+              isBusy={isPending}
+              disabled={false}
+              type="button"
+              onClick={() =>
+                setcheckPasssState((checkPasssState) => !checkPasssState)
+              }
+              aria-label={
+                checkPasssState ? "パスワードを表示" : "パスワードを非表示"
+              }
+            >
+              <FontAwesomeIcon icon={checkPasssState ? faEyeSlash : faEye} />
+            </Button>
+          </div>
+          <ErrorMsgField msg={fieldErrors.checkPassword?.message} />
+          <ErrorMsgField msg={fieldErrors.root?.message} />
+        </div>
         <Button
           variant="indigo"
           width="stretch"
           className="tracking-widest"
           isBusy={isPending}
           disabled={
-            !formMethods.formState.isValid ||
-            isPending ||
-            isSignUpCompleted
+            !formMethods.formState.isValid || isPending || isSignUpCompleted
           }
         >
           登録
